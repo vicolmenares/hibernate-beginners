@@ -25,11 +25,17 @@ public class Employee {
 	@Column(name="emp_name", length=28, nullable=false)
 	private String name;
 	
-	@Column(name="emp_role", length=28, nullable=false)
-	private String role;
+	@Column(name="emp_last_name", length=28, nullable=false)
+	private String lastName;
 	
-	@Column(name="sys_creation", nullable=false)
-	private Date insertTime;
+	@Column(name="emp_dni", nullable=false)
+	private long dni;
+
+	@Column(name="emp_email", nullable=false)
+	private String email;
+
+	@Column(name="emp_dni", nullable=false)
+	private String mobile;
 
 
     public Employee() {

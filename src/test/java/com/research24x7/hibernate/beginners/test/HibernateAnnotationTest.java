@@ -7,6 +7,10 @@ import java.util.List;
 
 import com.research24x7.hibernate.beginners.entity.Employee;
 import com.research24x7.hibernate.beginners.util.HibernateUtil;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 
@@ -16,168 +20,125 @@ import org.junit.jupiter.api.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.persistence.*;
 
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
+
+@Entity(name =  "Employee")
+@Table(name = "employee")
+public class Employee {
+
+
+    @Id
+    @GeneratedValue(strategy= GenerationType.IDENTITY)
+    @Column (name="emp_id", nullable=false, unique=true)
+    private int id;
+
+    @Column(name="emp_name", length=28, nullable=false)
+    private String name;
+
+    @Column(name="emp_last_name", length=28, nullable=false)
+    private String lastName;
+
+    @Column(name="emp_dni", nullable=false)
+    private long dni;
+
+    @Column(name="emp_email", nullable=false)
+    private String email;
+
+    @Column(name="emp_dni", nullable=false)
+    private String mobile;
+
+
+    public Employee() {
+
+        super ();
+    }
+
+    public Employee(String name, String role, Date insertTime) {
+
+        super ();
+
+        this.name = name;
+        this.role = role;
+        this.insertTime = insertTime;
+    }
+
+
+    public int getId () {
+
+        return this.id;
+    }
+
+    public void setId (int id) {
+
+        this.id = id;
+    }
+
+    public String getName () {
+
+        return this.name;
+    }
+
+    public void setName (String name) {
+
+        this.name = name;
+    }
+
+    public String getRole () {
+
+        return this.role;
+    }
+
+    public void setRole (String role) {
+
+        this.role = role;
+    }
+
+    public Date getInsertTime () {
+
+        return this.insertTime;
+    }
+
+    public void setInsertTime (Date insertTime) {
+
+        this.insertTime = insertTime;
+    }
+}
 public class HibernateAnnotationTest {
 
 
     private static SessionFactory sessionFactory;
 
-    private static final Logger logger = LoggerFactory.getLogger (HibernateAnnotationTest.class);
+    private static final Logger logger = LoggerFactory.getLogger(HibernateAnnotationTest.class);
 
 
-    public HibernateAnnotationTest () {
+    public HibernateAnnotationTest() {
 
-        super ();
+        super();
     }
 
 
     @BeforeAll
-    public static void setup () {
+    public static void setup() {
 
-        sessionFactory = HibernateUtil.getSessionFactory ();
+        sessionFactory = HibernateUtil.getSessionFactory();
     }
 
     @AfterAll
-    public static void destroy () {
+    public static void destroy() {
 
-        sessionFactory.close ();
+        sessionFactory.close();
     }
 
 
-    @Test
-    @DisplayName ("Create New Records")
-    public void m1 () {
+    @{...}
+    @DisplayName("Create New Records")
+    public void m1() {
 
-
-        // Get a session.
-        Session session = null;
-        Transaction tx = null;
-        try {
-
-            logger.info("Getting a session...");
-            session = sessionFactory.openSession ();
-            tx = session.beginTransaction ();
-
-            // Set the data to save.
-            logger.info("Creating values to insert...");
-            Employee[] values = new Employee[]{
-
-                    new Employee("Homer Simpson", "Test", new Date()),
-                    new Employee("Marge Simpson", "Test", new Date()),
-                    new Employee("Bart Simpson", "Test", new Date()),
-                    new Employee("Lisa Simpson", "Test", new Date()),
-                    new Employee("Maggie Simpson", "Test", new Date())
-            };
-
-            // Save the data.
-            for (Employee e : values) {
-
-                logger.info (String.format ("Saving value %s", e.getName ()));
-                session.save(e);
-                logger.info (String.format ("Value %s saved!", e.getName ()));
-            }
-            tx.commit ();
-            Assertions.assertTrue (values[0].getId () > 0, String.format ("Problems creating teh new employee %s", values[0].getName ()));
-
-        } catch (Exception ex) {
-
-            logger.error (ex.getMessage ());
-            tx.rollback ();
-            Assertions.assertFalse (Boolean.TRUE, "Problems executing the test.");
-
-        } finally { session.close (); }
-    }
-
-    @Test
-    @DisplayName ("Finding all Employees")
-    public void m2 () {
-
-        Session session = null;
-        List<Employee> employees;
-
-        try {
-
-            logger.info ("Executing select all employees.");
-            logger.info("Getting a session...");
-            session = sessionFactory.openSession ();
-
-            employees = (List)session.createCriteria (Employee.class).list ();
-
-            logger.info ("Print all employees info.");
-            employees.forEach ( e -> logger.info (e.getName ()));
-
-            Assertions.assertFalse (employees.isEmpty (), "There are not employees found!!!");
-
-        } catch (Exception e) {
-
-            logger.error (e.getMessage ());
-            Assertions.assertFalse (Boolean.TRUE, "Problems executing the test.");
-
-        } finally { session.close(); }
-    }
-
-    @Test
-    @DisplayName ("Update all Employees")
-    public void m3 () {
-
-        final Session session;
-        Transaction tx = null;
-        List<Employee> employees;
-
-        try {
-
-            logger.info ("Updating all employees.");
-            logger.info("Getting a session...");
-            session = sessionFactory.openSession ();
-            tx = session.beginTransaction ();
-
-            employees = (List)session.createCriteria (Employee.class).list ();
-
-            logger.info ("Print all employees info.");
-            employees.forEach (e -> {
-
-                logger.info (String.format ("Updating %s ", e.getName ()));
-                e.setName (e.getName ().toUpperCase ());
-                session.save (e);
-            });
-            tx.commit ();
-
-            Assertions.assertFalse (employees.isEmpty (), "There are not employees found!!!");
-
-        } catch (Exception e) {
-
-            logger.error (e.getMessage ());
-            Assertions.assertFalse (Boolean.TRUE, "Problems executing the test.");
-        }
-    }
-
-    @Test
-    @DisplayName ("Delete all employees")
-    public void m4 () {
-
-        final Session session;
-        Transaction tx;
-        List<Employee> values;
-
-        try {
-
-            logger.debug ("Delete all employees.");
-            session = sessionFactory.openSession ();
-            tx = session.beginTransaction ();
-            values = (List)session.createQuery ("From Employee").list ();
-
-            Assertions.assertFalse (values.isEmpty (), "There are not employees found!!!");
-
-            values.forEach (e -> session.delete (e));
-            tx.commit ();
-
-            values = (List)session.createQuery("From Employee").list ();
-            Assertions.assertTrue (values.isEmpty (), "There are employees found!!!");
-
-        } catch (Exception e) {
-
-            logger.error (e.getMessage ());
-            Assertions.assertFalse (Boolean.TRUE, "Problems executing the test.");
-        }
     }
 }
+
